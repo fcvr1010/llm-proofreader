@@ -141,48 +141,31 @@ class ModernResultsWindow(ctk.CTkToplevel):
         self.text_display.configure(state="normal")
         self.text_display.delete("1.0", "end")
 
-        # Parse result to extract fixes and suggestions. Printing
-        # the LLM output directly is a bit ugly.
+        # Parse result to extract feedback items
         lines = result_text.split("\n")
-        fixes = []
-        suggestions = []
-        current_section = None
+        feedback_items = []
+        in_feedback_section = False
 
         for line in lines:
             line = line.strip()
             if not line:
                 continue
 
-            if line == "FIXES:":
-                current_section = "fixes"
-            elif line == "SUGGESTIONS:":
-                current_section = "suggestions"
-            elif line.startswith("•"):
-                if current_section == "fixes":
-                    fixes.append(line)
-                elif current_section == "suggestions":
-                    suggestions.append(line)
+            if line == "FEEDBACK:":
+                in_feedback_section = True
+            elif line.startswith("•") and in_feedback_section:
+                feedback_items.append(line)
 
-        # Display fixes
-        if fixes:
-            self.text_display.insert("end", "Fixes Required:\n", "header_error")
-            for fix in fixes:
-                self.text_display.insert("end", f"{fix}\n\n", "bullet")
+        # Display feedback
+        if feedback_items:
+            for item in feedback_items:
+                self.text_display.insert("end", f"{item}\n\n", "bullet")
         else:
-            self.text_display.insert("end", "✓ No fixes required\n\n", "status_good")
-
-        # Display suggestions
-        if suggestions:
-            self.text_display.insert("end", "Suggestions:\n", "header_suggestion")
-            for suggestion in suggestions:
-                self.text_display.insert("end", f"{suggestion}\n\n", "bullet")
-        else:
-            self.text_display.insert("end", "✓ No suggestions\n\n", "status_good")
+            self.text_display.insert("end", "✓ No feedback - looks good!\n\n", "status_good")
 
         # Configure text tags
         self.text_display.tag_config("status_good", foreground="#27ae60")
-        self.text_display.tag_config("header_error", foreground="#e74c3c")
-        self.text_display.tag_config("header_suggestion", foreground="#f39c12")
+        self.text_display.tag_config("header", foreground="#667eea")
         self.text_display.tag_config("bullet", foreground="#2c3e50")
 
         self.text_display.configure(state="disabled")
