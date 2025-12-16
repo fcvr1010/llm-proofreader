@@ -32,6 +32,9 @@ class ModernResultsWindow(ctk.CTkToplevel):
         self.title("")
         self.attributes("-topmost", True)
 
+        # Intercept window close button to hide instead of destroy
+        self.protocol("WM_DELETE_WINDOW", self.hide_window)
+
         # Calculate window size - up to 1/3 of screen height
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
@@ -99,6 +102,11 @@ class ModernResultsWindow(ctk.CTkToplevel):
 
     def show_processing(self, token_count=None):
         """Show processing message."""
+        # Check if window still exists
+        if not self.winfo_exists():
+            logger.warning("Results window was destroyed, skipping show_processing")
+            return
+
         self.title_label.configure(text="✨ Processing...")
 
         # Enable editing first
@@ -124,6 +132,11 @@ class ModernResultsWindow(ctk.CTkToplevel):
 
     def show_result(self, result_text):
         """Display proofreading results."""
+        # Check if window still exists
+        if not self.winfo_exists():
+            logger.warning("Results window was destroyed, skipping show_result")
+            return
+
         self.title_label.configure(text="✨ Proofreading Results")
         self.text_display.configure(state="normal")
         self.text_display.delete("1.0", "end")
@@ -179,6 +192,11 @@ class ModernResultsWindow(ctk.CTkToplevel):
 
     def show_error(self, error_message):
         """Display an error message."""
+        # Check if window still exists
+        if not self.winfo_exists():
+            logger.warning("Results window was destroyed, skipping show_error")
+            return
+
         self.title_label.configure(text="❌ Error")
         self.text_display.configure(state="normal")
         self.text_display.delete("1.0", "end")
