@@ -35,25 +35,20 @@ LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 # Proofreading Prompt
 # ============================================================================
 
-PROOFREADING_PROMPT = """You are a professional proofreader. Review the following text and provide feedback.
+PROOFREADING_PROMPT = """Proofread the following [TEXT] and point out any errors.
 
-Text to review:
-"{text}"
+TEXT: "{text}"
 
 Format your response EXACTLY as follows:
 
-FIXES:
-[If there are grammar/spelling errors that MUST be fixed, list them as: "• original → correction (reason)"]
-[If no errors, write "None required"]
-
-SUGGESTIONS:
-[If there are style improvements or optional enhancements, list them as: "• original → suggestion (reason)"]
-[If no suggestions, write "None"]
+FEEDBACK:
+[If there are grammar/spelling errors, style improvements, or enhancements, list them as: "• original → suggestion (reason)"]
+[If no feedback, write "None required"]
 
 Rules:
-- FIXES are for actual errors (grammar, spelling, punctuation)
-- SUGGESTIONS are for style improvements (clarity, conciseness, better word choice)
-- Keep concise. Maximum 3-4 items per section."""
+- Errors first, suggestions later.
+- Keep concise. Maximum 5-6 items total.
+"""
 
 # ============================================================================
 # UI Messages
