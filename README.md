@@ -116,26 +116,19 @@ displayed in a pop-up window that you can close by clicking ESC.
 
 ## Running as a Background Service
 
-To run the application automatically on startup, create a systemd service.
+### 1. Install User Service
 
-**Important**: adapt the values in the following snippet to reflect your local setup.
-
-### 1. Create Service File
-
-Create `/etc/systemd/system/llm-proofreader.service`:
+Adapt the values below and copy the content into `~/.config/systemd/user/llm-proofreader.service`.
 
 ```ini
 [Unit]
 Description=LLM Proofreader Service
-After=network.target
+After=graphical-session.target network.target
 
 [Service]
 Type=simple
-User=francesco
-WorkingDirectory=/home/francesco/workspace/llm-proofreader
-Environment="DISPLAY=:0"
-Environment="XAUTHORITY=/home/francesco/.Xauthority"
-ExecStart=/home/francesco/.local/bin/poetry -C /home/francesco/workspace/llm-proofreader run python main.py
+WorkingDirectory=%h/workspace/llm-proofreader
+ExecStart=/home/francesco/.local/bin/poetry -C %h/workspace/llm-proofreader run python main.py
 Restart=on-failure
 RestartSec=5
 
@@ -143,18 +136,40 @@ RestartSec=5
 WantedBy=default.target
 ```
 
-### 2. Enable and Start Service
+Then enable the service.
 
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl enable llm-proofreader.service
-sudo systemctl start llm-proofreader.service
+# Reload systemd user daemon
+systemctl --user daemon-reload
 
+# Enable service to start on login
+systemctl --user enable llm-proofreader.service
+
+# Start service immediately
+systemctl --user start llm-proofreader.service
+```
+
+### 2. Check Status and Logs
+
+```bash
 # Check status
-sudo systemctl status llm-proofreader.service
+systemctl --user status llm-proofreader.service
 
 # View logs
-journalctl -u llm-proofreader.service -f
+journalctl --user -u llm-proofreader.service -f
+```
+
+### 3. Managing the Service
+
+```bash
+# Stop the service
+systemctl --user stop llm-proofreader.service
+
+# Restart the service
+systemctl --user restart llm-proofreader.service
+
+# Disable autostart
+systemctl --user disable llm-proofreader.service
 ```
 
 ## License
