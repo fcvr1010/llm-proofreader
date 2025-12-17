@@ -135,7 +135,12 @@ class ProofreaderApp:
             # Show processing and proofread
             self.show_processing_callback(token_count)
             result = self.proofread_text(selected_text)
-            self.show_result_callback(result)
+
+            # Check if result is an error message
+            if result.startswith("Error:"):
+                self.show_error_callback(result)
+            else:
+                self.show_result_callback(result)
 
         except Exception as e:
             logger.error(f"Error in proofreading workflow: {e}")
